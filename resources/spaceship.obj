@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'Intergalactic Spaceship_Blender_2.79b_BI.blend'
 # www.blender.org
-mtllib Intergalactic_Spaceship-(Wavefront).mtl
+mtllib spaceship.mtl
 o Intergalactic_Spaceship_RetopoGroup2
 v -0.000291 -0.479220 2.393769
 v 0.078977 -0.493138 2.387064
