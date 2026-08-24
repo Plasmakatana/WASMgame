@@ -1377,7 +1377,7 @@ int main(void)
             // ------------------------------------------------
 
             if (
-                IsKeyPressed(KEY_R)
+                IsKeyPressed(KEY_R)|| IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
             )
             {
                 gameOver =
@@ -1830,8 +1830,8 @@ if(IsKeyDown(KEY_LEFT_SHIFT)){
             );
 
             DrawText(
-                "Press R to restart",
-                SCREEN_WIDTH / 2 - 110,
+                "Press R or Click/Tap to Restart",
+                SCREEN_WIDTH / 2 - 180,
                 330,
                 25,
                 WHITE
