@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <stdio.h>
-
+#include <math.h>
 #define MAX_ASTEROIDS 100
 
 #define SCREEN_WIDTH  1280
@@ -73,13 +73,17 @@ typedef struct
     Vector3 rotationAxis;
 
 } Asteroid;
-
+typedef struct {
+    Vector3 position;
+    float speed;
+    bool present;
+} Particle;
 // ============================================================
 // GLOBAL GAME STATE
 // ============================================================
 
 static Asteroid asteroids[MAX_ASTEROIDS];
-
+static Particle particles[100] = {(Vector3){0.0f,0.0f,0.0f},30.0f,false};
 static int asteroidCount = 0;
 
 static bool gameOver = false;
@@ -89,7 +93,11 @@ static float score = 0.0f;
 // ============================================================
 // LIGHT CREATION
 // ============================================================
-
+float Signum(float x) {
+    if (x > 0.0f) return 1.0f;
+    if (x < 0.0f) return -1.0f;
+    return 0.0f;
+}
 static GameLight CreateGameLight(
     Shader shader,
     int index,
@@ -1079,7 +1087,31 @@ int main(void)
                 8.0f;
             float movement =
                 moveSpeed * dt;
+            
+            Vector3 clickPosition;
+            bool hasTarget = false;
+            if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+                Ray ray = GetMouseRay(GetMousePosition(), camera);
+                if (fabs(ray.direction.z) > 0.0001f)
+                {
+                    float t = -ray.position.z / ray.direction.z;
 
+                    if (t >= 0.0f)
+                        {
+                            clickPosition = Vector3Add(
+                                ray.position,
+                                Vector3Scale(ray.direction, t)
+                            );
+
+                            hasTarget = true;
+                        }
+                        hasTarget=false;
+                }
+                
+                accelX=Signum(clickPosition.x-shipPos.x)*0.008f;
+                accelY=Signum(clickPosition.y-shipPos.y)*0.008f;                 
+            }
+            else{accelX/=1.1f;accelY/=1.1f;}
             if (
                 IsKeyDown(KEY_LEFT) ||
                 IsKeyDown(KEY_A)
@@ -1119,13 +1151,16 @@ int main(void)
                 //shipPos.y -=
                   //  movement;
             }
+            
             velX+=accelX;
             velY+=accelY;
             velX=Clamp(velX,-0.5f,0.5f);
             velY=Clamp(velY,-0.5f,0.5f);
+
             shipPos.x+=velX;
             shipPos.y+=velY;
             shipLight.position=(Vector3){shipPos.x,shipPos.y,shipPos.z+2.0f};
+            
             // ------------------------------------------------
             // Player bounds
             // ------------------------------------------------
@@ -1178,9 +1213,16 @@ int main(void)
             else if(velX<0&&(!IsKeyDown(KEY_D))&&(!IsKeyDown(KEY_RIGHT))){velX+=0.005;}
             if(velY>0&&(!IsKeyDown(KEY_W))&&(!IsKeyDown(KEY_UP))){velY-=0.005;}
             else if((!IsKeyDown(KEY_S))&&(!IsKeyDown(KEY_DOWN))){velY+=0.005;}
+            if(GetRandomValue(0,100)<70){
+                Particle particle = {0};
+                particle.position=(Vector3){(float)GetRandomValue(-20,20),(float)GetRandomValue(-10,10),100.0f};
+                particle.speed = 30.0f + (float)GetRandomValue(0.0f,30.0f);
+                int idx = (int)GetRandomValue(0,99);
+                if(particles[idx].present==false){particles[idx]=particle;particles[idx].present=true;}
+            }
             if (
                 asteroidCount < MAX_ASTEROIDS &&
-                GetRandomValue(0, 100) < (int)(3+counter*100)
+                GetRandomValue(0, 100) < fminf(20,(int)(3+score/10))
             )
             {
                 Asteroid asteroid =
@@ -1257,13 +1299,14 @@ int main(void)
                 i++
             )
             {
-                if(IsKeyDown(KEY_LEFT_SHIFT)){asteroids[i].speed=25.0f;}
+                if(IsKeyDown(KEY_LEFT_SHIFT)){asteroids[i].position.z-=asteroids[i].speed*dt*2.0f+score/1000;particles[i].position.z-=particles[i].speed*dt*8.0f+score/1000;}else{
                 
                 asteroids[i]
                     .position.z -=
                     asteroids[i].speed *
-                    dt+counter;
-
+                    dt+score/1000;
+                particles[i].position.z-=particles[i].speed*dt*4.0f+score/1000;
+                }
                 asteroids[i]
                     .rotationAngle +=
                     asteroids[i].rotationSpeed *
@@ -1276,7 +1319,7 @@ int main(void)
 
             int newCount =
                 0;
-
+            
             for (
                 int i = 0;
                 i < asteroidCount;
@@ -1297,7 +1340,9 @@ int main(void)
 
             asteroidCount =
                 newCount;
-
+            for(int i=0;i<100;i++){
+                if(particles[i].position.z>-10.0f&&particles[i].present==true){particles[i].present=false;}
+            }
             // ------------------------------------------------
             // Collision
             // ------------------------------------------------
@@ -1488,7 +1533,14 @@ int main(void)
         // ----------------------------------------------------
         // Draw asteroids
         // ----------------------------------------------------
-
+        for(int i=0;i<100;i++){
+            if(!(particles[i].position.z>30.0f||(particles[i].position.x<=0.1f&&particles[i].position.x>= -0.1f)
+            || (particles[i].position.y<=0.1f&&particles[i].position.y>= -0.1f))){
+            DrawCylinderEx(particles[i].position,
+                (Vector3){particles[i].position.x,particles[i].position.y,particles[i].position.z+particles[i].speed/10},
+                0.01f,0.005f,6,(Color){255,255,255,255});
+            }
+        }
         for (
             int i = 0;
             i < asteroidCount;
@@ -1630,6 +1682,80 @@ DrawCylinderEx(
     0.1f,0.0f,6,
     (Color){150,000,255,180}
 );
+if(accelX>0.0001f){DrawCylinderEx(
+        (Vector3){shipPos.x-2.0f,shipPos.y,shipPos.z-0.5f},
+        (Vector3){shipPos.x-3.0f-accelX*300.0f,shipPos.y,shipPos.z-1.0f},
+        0.1f,0.0f,6,
+        (Color){255,100,030,180}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x-2.0f,shipPos.y,shipPos.z-0.5f},
+        (Vector3){shipPos.x-2.25f-accelX*50.0f,shipPos.y,shipPos.z-1.0f},
+        0.1f,0.2f,4,
+        (Color){255,120,200,220}
+    );}
+else if(accelX<-0.0001f){DrawCylinderEx(
+        (Vector3){shipPos.x+2.0f,shipPos.y,shipPos.z-0.5f},
+        (Vector3){shipPos.x+3.0f-accelX*300.0f,shipPos.y,shipPos.z-1.0f},
+        0.1f,0.0f,6,
+        (Color){255,100,030,180}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x+2.0f,shipPos.y,shipPos.z-0.5f},
+        (Vector3){shipPos.x+2.25f-accelX*50.0f,shipPos.y,shipPos.z-1.0f},
+        0.1f,0.2f,4,
+        (Color){255,120,200,220}
+    );}
+else{}
+if(accelY>0.0001f){DrawCylinderEx(
+        (Vector3){shipPos.x+0.5f,shipPos.y-0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+1.0f,shipPos.y-1.5f-accelY*200.0f,shipPos.z-0.5f},
+        0.1f,0.0f,6,
+        (Color){255,100,030,180}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x-0.5f,shipPos.y-0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-1.0f,shipPos.y-1.5f-accelY*200.0f,shipPos.z-0.5f},
+        0.1f,0.0f,6,
+        (Color){255,100,030,180}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x-0.25f,shipPos.y-0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-0.5f,shipPos.y-0.75f-accelY*50.0f,shipPos.z-0.5f},
+        0.2f,0.0f,4,
+        (Color){255,120,200,220}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x+0.25f,shipPos.y-0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+0.5f,shipPos.y-0.75f-accelY*50.0f,shipPos.z-0.5f},
+        0.2f,0.0f,4,
+        (Color){255,120,200,220}
+    );}
+else if(accelY<-0.0001f){DrawCylinderEx(
+        (Vector3){shipPos.x+0.5f,shipPos.y+0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+1.0f,shipPos.y+1.5f-accelY*200.0f,shipPos.z-1.0f},
+        0.1f,0.0f,6,
+        (Color){255,100,030,180}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x-0.5f,shipPos.y+0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-1.0f,shipPos.y+1.5f-accelY*200.0f,shipPos.z-1.0f},
+        0.1f,0.0f,6,
+        (Color){255,100,030,180}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x+0.25f,shipPos.y+0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+0.5f,shipPos.y+0.75f-accelY*50.0f,shipPos.z-0.5f},
+        0.2f,0.0f,6,
+        (Color){255,120,200,220}
+    );
+    DrawCylinderEx(
+        (Vector3){shipPos.x-0.25f,shipPos.y+0.25f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-0.5f,shipPos.y+0.75f-accelY*50.0f,shipPos.z-0.5f},
+        0.2f,0.0f,6,
+        (Color){255,129,200,220}
+    );}
+else{}
 DrawModelEx(shipModel,shipPos,(Vector3){0.0f,0.0f,1.0f},0.0f,(Vector3){SHIP_SCALE,SHIP_SCALE,SHIP_SCALE},(Color){255,255,255,255});
 if(IsKeyDown(KEY_LEFT_SHIFT)){
     DrawCylinderEx(
@@ -1686,7 +1812,7 @@ if(IsKeyDown(KEY_LEFT_SHIFT)){
         );
 
         DrawText(
-            "WASD / Arrow Keys - Move | LShift - Boost",
+            "WASD / Arrow Keys / TouchScreen - Move | LShift - Boost",
             20,
             SCREEN_HEIGHT - 35,
             20,
