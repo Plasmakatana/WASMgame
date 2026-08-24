@@ -1684,74 +1684,74 @@ DrawCylinderEx(
 );
 if(accelX>0.0001f){DrawCylinderEx(
         (Vector3){shipPos.x-2.0f,shipPos.y,shipPos.z-0.5f},
-        (Vector3){shipPos.x-3.0f-accelX*300.0f,shipPos.y,shipPos.z-1.0f},
+        (Vector3){shipPos.x-3.0f-accelX*75.0f,shipPos.y,shipPos.z-1.0f},
         0.1f,0.0f,6,
         (Color){255,100,030,180}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x-2.0f,shipPos.y,shipPos.z-0.5f},
-        (Vector3){shipPos.x-2.25f-accelX*50.0f,shipPos.y,shipPos.z-1.0f},
+        (Vector3){shipPos.x-2.25f-accelX*25.0f,shipPos.y,shipPos.z-1.0f},
         0.1f,0.2f,4,
         (Color){255,120,200,220}
     );}
 else if(accelX<-0.0001f){DrawCylinderEx(
         (Vector3){shipPos.x+2.0f,shipPos.y,shipPos.z-0.5f},
-        (Vector3){shipPos.x+3.0f-accelX*300.0f,shipPos.y,shipPos.z-1.0f},
+        (Vector3){shipPos.x+3.0f-accelX*75.0f,shipPos.y,shipPos.z-1.0f},
         0.1f,0.0f,6,
         (Color){255,100,030,180}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x+2.0f,shipPos.y,shipPos.z-0.5f},
-        (Vector3){shipPos.x+2.25f-accelX*50.0f,shipPos.y,shipPos.z-1.0f},
+        (Vector3){shipPos.x+2.25f-accelX*25.0f,shipPos.y,shipPos.z-1.0f},
         0.1f,0.2f,4,
         (Color){255,120,200,220}
     );}
 else{}
 if(accelY>0.0001f){DrawCylinderEx(
         (Vector3){shipPos.x+0.5f,shipPos.y-0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x+1.0f,shipPos.y-1.5f-accelY*200.0f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+1.0f,shipPos.y-1.5f-accelY*50.0f,shipPos.z-0.5f},
         0.1f,0.0f,6,
         (Color){255,100,030,180}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x-0.5f,shipPos.y-0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x-1.0f,shipPos.y-1.5f-accelY*200.0f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-1.0f,shipPos.y-1.5f-accelY*50.0f,shipPos.z-0.5f},
         0.1f,0.0f,6,
         (Color){255,100,030,180}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x-0.25f,shipPos.y-0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x-0.5f,shipPos.y-0.75f-accelY*50.0f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-0.5f,shipPos.y-0.75f-accelY*25.0f,shipPos.z-0.5f},
         0.2f,0.0f,4,
         (Color){255,120,200,220}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x+0.25f,shipPos.y-0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x+0.5f,shipPos.y-0.75f-accelY*50.0f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+0.5f,shipPos.y-0.75f-accelY*25.0f,shipPos.z-0.5f},
         0.2f,0.0f,4,
         (Color){255,120,200,220}
     );}
 else if(accelY<-0.0001f){DrawCylinderEx(
         (Vector3){shipPos.x+0.5f,shipPos.y+0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x+1.0f,shipPos.y+1.5f-accelY*200.0f,shipPos.z-1.0f},
+        (Vector3){shipPos.x+1.0f,shipPos.y+1.5f-accelY*50.0f,shipPos.z-1.0f},
         0.1f,0.0f,6,
         (Color){255,100,030,180}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x-0.5f,shipPos.y+0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x-1.0f,shipPos.y+1.5f-accelY*200.0f,shipPos.z-1.0f},
+        (Vector3){shipPos.x-1.0f,shipPos.y+1.5f-accelY*50.0f,shipPos.z-1.0f},
         0.1f,0.0f,6,
         (Color){255,100,030,180}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x+0.25f,shipPos.y+0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x+0.5f,shipPos.y+0.75f-accelY*50.0f,shipPos.z-0.5f},
+        (Vector3){shipPos.x+0.5f,shipPos.y+0.75f-accelY*25.0f,shipPos.z-0.5f},
         0.2f,0.0f,6,
         (Color){255,120,200,220}
     );
     DrawCylinderEx(
         (Vector3){shipPos.x-0.25f,shipPos.y+0.25f,shipPos.z-0.5f},
-        (Vector3){shipPos.x-0.5f,shipPos.y+0.75f-accelY*50.0f,shipPos.z-0.5f},
+        (Vector3){shipPos.x-0.5f,shipPos.y+0.75f-accelY*25.0f,shipPos.z-0.5f},
         0.2f,0.0f,6,
         (Color){255,129,200,220}
     );}
